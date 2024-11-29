@@ -28,9 +28,11 @@
  * (like a one line \c if). In practice, this is not an issue, since \@onExit is
  * a useless construct in such a case anyways.
  */
+#ifndef onExit
 #define onExit \
     ext_keywordify \
     __strong ext_cleanupBlock_t metamacro_concat(ext_exitBlock_, __LINE__) __attribute__((cleanup(ext_executeCleanupBlock), unused)) = ^
+#endif
 
 /**
  * Creates \c __weak shadow variables for each of the variables provided as
@@ -42,17 +44,21 @@
  *
  * See #strongify for an example of usage.
  */
+#ifndef weakify
 #define weakify(...) \
     ext_keywordify \
     metamacro_foreach_cxt(ext_weakify_,, __weak, __VA_ARGS__)
+#endif
 
 /**
  * Like #weakify, but uses \c __unsafe_unretained instead, for targets or
  * classes that do not support weak references.
  */
+#ifndef unsafeify
 #define unsafeify(...) \
     ext_keywordify \
     metamacro_foreach_cxt(ext_weakify_,, __unsafe_unretained, __VA_ARGS__)
+#endif
 
 /**
  * Strongly references each of the variables provided as arguments, which must
@@ -80,12 +86,14 @@
 
  * @endcode
  */
+#ifndef strongify
 #define strongify(...) \
     ext_keywordify \
     _Pragma("clang diagnostic push") \
     _Pragma("clang diagnostic ignored \"-Wshadow\"") \
     metamacro_foreach(ext_strongify_,, __VA_ARGS__) \
     _Pragma("clang diagnostic pop")
+#endif
 
 /*** implementation details follow ***/
 typedef void (^ext_cleanupBlock_t)(void);

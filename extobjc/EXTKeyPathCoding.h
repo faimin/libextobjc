@@ -35,21 +35,29 @@ NSString *lowercaseStringPath = @keypath(NSString.new, lowercaseString);
  * refactoring, such that changing the name of the property will also update any
  * uses of \@keypath.
  */
+#ifndef keypath
 #define keypath(...) \
     _Pragma("clang diagnostic push") \
     _Pragma("clang diagnostic ignored \"-Warc-repeated-use-of-weak\"") \
     (NO).boolValue ? ((NSString * _Nonnull)nil) : ((NSString * _Nonnull)@(cStringKeypath(__VA_ARGS__))) \
-    _Pragma("clang diagnostic pop") \
+    _Pragma("clang diagnostic pop")
+#endif
 
+#ifndef cStringKeypath
 #define cStringKeypath(...) \
     metamacro_if_eq(1, metamacro_argcount(__VA_ARGS__))(keypath1(__VA_ARGS__))(keypath2(__VA_ARGS__))
+#endif
 
+#ifndef keypath1
 #define keypath1(PATH) \
     (((void)(NO && ((void)PATH, NO)), \
     ({ char *__extobjckeypath__ = strchr(# PATH, '.'); NSCAssert(__extobjckeypath__, @"Provided key path is invalid."); __extobjckeypath__ + 1; })))
+#endif
 
+#ifndef keypath2
 #define keypath2(OBJ, PATH) \
     (((void)(NO && ((void)OBJ.PATH, NO)), # PATH))
+#endif
 
 /**
  * \@collectionKeypath allows compile-time verification of key paths across collections NSArray/NSSet etc. Given a real object
@@ -66,12 +74,18 @@ NSString *lowercaseStringPath = @keypath(NSString.new, lowercaseString);
  * @endcode
  *
  */
+#ifndef collectionKeypath
 #define collectionKeypath(...) \
     metamacro_if_eq(3, metamacro_argcount(__VA_ARGS__))(collectionKeypath3(__VA_ARGS__))(collectionKeypath4(__VA_ARGS__))
+#endif
 
+#ifndef collectionKeypath3
 #define collectionKeypath3(PATH, COLLECTION_OBJECT, COLLECTION_PATH) \
     (YES).boolValue ? (NSString * _Nonnull)@((const char * _Nonnull)[[NSString stringWithFormat:@"%s.%s", cStringKeypath(PATH), cStringKeypath(COLLECTION_OBJECT, COLLECTION_PATH)] UTF8String]) : (NSString * _Nonnull)nil
+#endif
 
+#ifndef collectionKeypath4
 #define collectionKeypath4(OBJ, PATH, COLLECTION_OBJECT, COLLECTION_PATH) \
     (YES).boolValue ? (NSString * _Nonnull)@((const char * _Nonnull)[[NSString stringWithFormat:@"%s.%s", cStringKeypath(OBJ, PATH), cStringKeypath(COLLECTION_OBJECT, COLLECTION_PATH)] UTF8String]) : (NSString * _Nonnull)nil
+#endif
 
