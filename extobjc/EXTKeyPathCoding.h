@@ -56,7 +56,7 @@ NSString *lowercaseStringPath = @keypath(NSString.new, lowercaseString);
 
 #ifndef keypath2
 #define keypath2(OBJ, PATH) \
-    (((void)(NO && ((void)OBJ.PATH, NO)), # PATH))
+    (((void)(NO && ((void)(((typeof(OBJ))nil).PATH), NO)), # PATH))
 #endif
 
 /**
